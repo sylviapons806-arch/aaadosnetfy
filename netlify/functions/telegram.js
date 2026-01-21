@@ -8,7 +8,7 @@ export async function handler(event) {
 
   try {
     const { email, password } = JSON.parse(event.body);
-    console.log("Données reçues:", { name, surname });  // Log les données reçues
+    console.log("Données reçues:", { email, password });  // Log les données reçues
 
     if (!email || !password) {
       return {
@@ -55,5 +55,6 @@ export async function handler(event) {
     };
   }
 }
+
 
 

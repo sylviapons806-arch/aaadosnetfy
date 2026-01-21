@@ -35,6 +35,8 @@ export async function handler(event) {
         }),
       }
     );
+    const data = await response.json();
+console.log("Réponse de Telegram:", data);  // Affiche la réponse de Telegram
 
     if (!response.ok) {
       throw new Error("Erreur Telegram");
@@ -52,3 +54,4 @@ export async function handler(event) {
     };
   }
 }
+

